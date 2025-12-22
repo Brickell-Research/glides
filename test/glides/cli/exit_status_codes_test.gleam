@@ -5,6 +5,7 @@ import test_helpers
 /// ==== to_int ====
 pub fn to_int_test() {
   [
+    // #(ExistStatusCode, expected_output, failure_msg)
     #(Success, 0, "Expected success to equal 0."),
     #(Failure, 1, "Expected failure to equal 1."),
   ]

@@ -6,6 +6,7 @@ import test_helpers
 // ==== handle_args ====
 pub fn handle_args_test() {
   [
+    // #(command/arg(s), expected_output, failure_msg)
     // help arg
     #(["--help"], Success, "Expected --help args to succeed"),
     #(["-H"], Success, "Expected -H args to succeed"),

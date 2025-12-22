@@ -1,0 +1,20 @@
+# Welcome
+
+This is the first slide.
+
+---
+
+# Second Slide
+
+- Bullet point
+- Another point
+
+---
+
+# Code Example
+
+```gleam
+pub fn main() {
+  io.println("Hello!")
+}
+```
