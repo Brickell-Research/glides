@@ -179,7 +179,7 @@ jobs:
           echo "  linux-x64:   $SHA_LINUX_X64"
 
           # Clone the tap repository
-          git clone https://x-access-token:${HOMEBREW_TAP_TOKEN}@github.com/rdurst/homebrew-glides.git tap
+          git clone https://x-access-token:${HOMEBREW_TAP_TOKEN}@github.com/Brickell-Research/homebrew-glides.git tap
           cd tap
 
           # Create Formula directory if it doesn't exist
@@ -189,19 +189,19 @@ jobs:
           cat > Formula/glides.rb << FORMULA_END
           class Glides < Formula
             desc "Djot to HTML slideshow generator"
-            homepage "https://github.com/rdurst/glides"
+            homepage "https://github.com/Brickell-Research/glides"
             license "MIT"
             version "${VERSION}"
 
             # Platform-specific downloads
             if OS.mac? && Hardware::CPU.intel?
-              url "https://github.com/rdurst/glides/releases/download/v${VERSION}/glides-${VERSION}-macos-x64.tar.gz"
+              url "https://github.com/Brickell-Research/glides/releases/download/v${VERSION}/glides-${VERSION}-macos-x64.tar.gz"
               sha256 "${SHA_MACOS_X64}"
             elsif OS.mac? && Hardware::CPU.arm?
-              url "https://github.com/rdurst/glides/releases/download/v${VERSION}/glides-${VERSION}-macos-arm64.tar.gz"
+              url "https://github.com/Brickell-Research/glides/releases/download/v${VERSION}/glides-${VERSION}-macos-arm64.tar.gz"
               sha256 "${SHA_MACOS_ARM64}"
             elsif OS.linux? && Hardware::CPU.intel?
-              url "https://github.com/rdurst/glides/releases/download/v${VERSION}/glides-${VERSION}-linux-x64.tar.gz"
+              url "https://github.com/Brickell-Research/glides/releases/download/v${VERSION}/glides-${VERSION}-linux-x64.tar.gz"
               sha256 "${SHA_LINUX_X64}"
             end
 
