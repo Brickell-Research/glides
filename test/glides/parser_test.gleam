@@ -142,8 +142,13 @@ pub fn extract_frontmatter_test() {
     ),
   ]
   |> list.each(fn(test_case) {
-    let #(containers, expected_title, expected_author, expected_rest, failure_msg) =
-      test_case
+    let #(
+      containers,
+      expected_title,
+      expected_author,
+      expected_rest,
+      failure_msg,
+    ) = test_case
     let #(title, author, rest) = parser.extract_frontmatter(containers)
 
     // assert title

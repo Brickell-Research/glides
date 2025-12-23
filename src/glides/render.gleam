@@ -58,7 +58,11 @@ pub fn render_container(container: Container) -> String {
         Some(lang) -> " class=\"language-" <> lang <> "\""
         None -> ""
       }
-      "<pre><code" <> class_attr <> ">" <> escape_html(content) <> "</code></pre>"
+      "<pre><code"
+      <> class_attr
+      <> ">"
+      <> escape_html(content)
+      <> "</code></pre>"
     }
     jot.ThematicBreak -> "<hr>"
     jot.BulletList(_, _, items) -> {
@@ -107,9 +111,12 @@ pub fn render_inline(inline: Inline) -> String {
     jot.Span(_, inlines) -> "<span>" <> render_inlines(inlines) <> "</span>"
     jot.Linebreak -> "<br>"
     jot.NonBreakingSpace -> "&nbsp;"
-    jot.Footnote(ref) -> "<sup><a href=\"#fn-" <> ref <> "\">" <> ref <> "</a></sup>"
-    jot.MathInline(content) -> "<span class=\"math\">" <> escape_html(content) <> "</span>"
-    jot.MathDisplay(content) -> "<div class=\"math-display\">" <> escape_html(content) <> "</div>"
+    jot.Footnote(ref) ->
+      "<sup><a href=\"#fn-" <> ref <> "\">" <> ref <> "</a></sup>"
+    jot.MathInline(content) ->
+      "<span class=\"math\">" <> escape_html(content) <> "</span>"
+    jot.MathDisplay(content) ->
+      "<div class=\"math-display\">" <> escape_html(content) <> "</div>"
   }
 }
 
@@ -134,16 +141,8 @@ pub fn html_wrapper(title: Option(String), content: String) -> String {
 <head>
 <meta charset=\"UTF-8\">
 <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
-<title>"
-  <> title_text
-  <> "</title>"
-  <> default_styles()
-  <> "</head>
-<body>"
-  <> content
-  <> "<div id=\"slide-counter\"></div>"
-  <> navigation_script()
-  <> "</body>
+<title>" <> title_text <> "</title>" <> default_styles() <> "</head>
+<body>" <> content <> "<div id=\"slide-counter\"></div>" <> navigation_script() <> "</body>
 </html>"
 }
 
