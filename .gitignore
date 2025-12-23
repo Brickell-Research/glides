@@ -5,3 +5,5 @@ erl_crash.dump
 
 test/test_corpus/*.html
 .DS_STORE
+
+gleam.toml.html

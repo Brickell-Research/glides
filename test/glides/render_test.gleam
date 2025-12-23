@@ -3,7 +3,6 @@ import gleam/list
 import gleam/option.{None, Some}
 import gleam/string
 import glides/parser
-import glides/presentation.{Presentation}
 import glides/render
 import glides/slide.{Slide}
 import jot
@@ -16,7 +15,11 @@ pub fn render_inline_test() {
     // #(inline, expected_html, failure_msg)
     #(jot.Text("Hello"), "Hello", "Text should render as-is"),
     #(jot.Text("<script>"), "&lt;script&gt;", "Text should escape HTML"),
-    #(jot.Code("let x = 1"), "<code>let x = 1</code>", "Code should wrap in code tag"),
+    #(
+      jot.Code("let x = 1"),
+      "<code>let x = 1</code>",
+      "Code should wrap in code tag",
+    ),
     #(
       jot.Emphasis([jot.Text("italic")]),
       "<em>italic</em>",
@@ -177,10 +180,9 @@ pub fn render_slide_test() {
       "Slide with title should contain slide-title class",
     ),
     #(
-      Slide(
-        title: None,
-        content: [jot.Paragraph(dict.new(), [jot.Text("Content")])],
-      ),
+      Slide(title: None, content: [
+        jot.Paragraph(dict.new(), [jot.Text("Content")]),
+      ]),
       1,
       3,
       "<p>Content</p>",
@@ -205,7 +207,14 @@ pub fn render_presentation_test() {
     // #(file, expected_contains_list, failure_msg)
     #(
       "test/test_corpus/simple.djot",
-      ["<html", "</html>", "<section", "Welcome", "Second Slide", "Code Example"],
+      [
+        "<html",
+        "</html>",
+        "<section",
+        "Welcome",
+        "Second Slide",
+        "Code Example",
+      ],
       "simple.djot should render all slides with proper HTML structure",
     ),
     #(
@@ -249,7 +258,14 @@ pub fn html_wrapper_test() {
     #(
       None,
       "<section>test</section>",
-      ["<!DOCTYPE html>", "<html", "</html>", "<head>", "<body>", "<section>test</section>"],
+      [
+        "<!DOCTYPE html>",
+        "<html",
+        "</html>",
+        "<head>",
+        "<body>",
+        "<section>test</section>",
+      ],
       "HTML wrapper should contain basic structure",
     ),
     #(
