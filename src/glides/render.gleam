@@ -1,54 +1,150 @@
-import gleam/option.{type Option}
+import gleam/int
+import gleam/list
+import gleam/option.{type Option, None, Some}
+import gleam/string
 import glides/presentation.{type Presentation}
 import glides/slide.{type Slide}
 import jot.{type Container, type Inline}
 
 /// Render a complete presentation to HTML
 pub fn render_presentation(presentation: Presentation) -> String {
-  // TODO: Implement
-  ""
+  let total = list.length(presentation.slides)
+  let slides_html =
+    presentation.slides
+    |> list.index_map(fn(slide, index) { render_slide(slide, index, total) })
+    |> string.concat
+
+  html_wrapper(presentation.title, slides_html)
 }
 
 /// Render a single slide to HTML
-pub fn render_slide(slide: Slide, index: Int, total: Int) -> String {
-  // TODO: Implement
-  ""
+pub fn render_slide(slide: Slide, _index: Int, _total: Int) -> String {
+  let title_html = render_title(slide.title)
+  let content_html = render_containers(slide.content)
+
+  "<section class=\"slide\">"
+  <> title_html
+  <> "<div class=\"slide-content\">"
+  <> content_html
+  <> "</div></section>"
 }
 
 /// Render slide title (list of inlines) to HTML
 pub fn render_title(title: Option(List(Inline))) -> String {
-  // TODO: Implement
-  ""
+  case title {
+    None -> ""
+    Some(inlines) ->
+      "<h1 class=\"slide-title\">" <> render_inlines(inlines) <> "</h1>"
+  }
 }
 
 /// Render a list of containers to HTML
 pub fn render_containers(containers: List(Container)) -> String {
-  // TODO: Implement
-  ""
+  containers
+  |> list.map(render_container)
+  |> string.concat
 }
 
 /// Render a single container to HTML
 pub fn render_container(container: Container) -> String {
-  // TODO: Implement
-  ""
+  case container {
+    jot.Paragraph(_, inlines) -> "<p>" <> render_inlines(inlines) <> "</p>"
+    jot.Heading(_, level, inlines) -> {
+      let tag = "h" <> int.to_string(level)
+      "<" <> tag <> ">" <> render_inlines(inlines) <> "</" <> tag <> ">"
+    }
+    jot.Codeblock(_, language, content) -> {
+      let class_attr = case language {
+        Some(lang) -> " class=\"language-" <> lang <> "\""
+        None -> ""
+      }
+      "<pre><code" <> class_attr <> ">" <> escape_html(content) <> "</code></pre>"
+    }
+    jot.ThematicBreak -> "<hr>"
+    jot.BulletList(_, _, items) -> {
+      let items_html =
+        items
+        |> list.map(fn(item) { "<li>" <> render_containers(item) <> "</li>" })
+        |> string.concat
+      "<ul>" <> items_html <> "</ul>"
+    }
+    jot.BlockQuote(_, items) ->
+      "<blockquote>" <> render_containers(items) <> "</blockquote>"
+    jot.Div(_, items) -> "<div>" <> render_containers(items) <> "</div>"
+    jot.RawBlock(content) -> content
+  }
 }
 
 /// Render a list of inlines to HTML
 pub fn render_inlines(inlines: List(Inline)) -> String {
-  // TODO: Implement
-  ""
+  inlines
+  |> list.map(render_inline)
+  |> string.concat
 }
 
 /// Render a single inline to HTML
 pub fn render_inline(inline: Inline) -> String {
-  // TODO: Implement
-  ""
+  case inline {
+    jot.Text(text) -> escape_html(text)
+    jot.Code(content) -> "<code>" <> escape_html(content) <> "</code>"
+    jot.Emphasis(inlines) -> "<em>" <> render_inlines(inlines) <> "</em>"
+    jot.Strong(inlines) -> "<strong>" <> render_inlines(inlines) <> "</strong>"
+    jot.Link(_, inlines, destination) -> {
+      let href = case destination {
+        jot.Url(url) -> url
+        jot.Reference(ref) -> "#" <> ref
+      }
+      "<a href=\"" <> href <> "\">" <> render_inlines(inlines) <> "</a>"
+    }
+    jot.Image(_, inlines, destination) -> {
+      let src = case destination {
+        jot.Url(url) -> url
+        jot.Reference(ref) -> ref
+      }
+      let alt = render_inlines(inlines)
+      "<img src=\"" <> src <> "\" alt=\"" <> alt <> "\">"
+    }
+    jot.Span(_, inlines) -> "<span>" <> render_inlines(inlines) <> "</span>"
+    jot.Linebreak -> "<br>"
+    jot.NonBreakingSpace -> "&nbsp;"
+    jot.Footnote(ref) -> "<sup><a href=\"#fn-" <> ref <> "\">" <> ref <> "</a></sup>"
+    jot.MathInline(content) -> "<span class=\"math\">" <> escape_html(content) <> "</span>"
+    jot.MathDisplay(content) -> "<div class=\"math-display\">" <> escape_html(content) <> "</div>"
+  }
+}
+
+/// Escape HTML special characters
+fn escape_html(text: String) -> String {
+  text
+  |> string.replace("&", "&amp;")
+  |> string.replace("<", "&lt;")
+  |> string.replace(">", "&gt;")
+  |> string.replace("\"", "&quot;")
 }
 
 /// Generate the HTML document wrapper (head, body, styles, scripts)
 pub fn html_wrapper(title: Option(String), content: String) -> String {
-  // TODO: Implement
-  ""
+  let title_text = case title {
+    Some(t) -> t
+    None -> "Presentation"
+  }
+
+  "<!DOCTYPE html>
+<html lang=\"en\">
+<head>
+<meta charset=\"UTF-8\">
+<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+<title>"
+  <> title_text
+  <> "</title>"
+  <> default_styles()
+  <> "</head>
+<body>"
+  <> content
+  <> "<div id=\"slide-counter\"></div>"
+  <> navigation_script()
+  <> "</body>
+</html>"
 }
 
 /// Generate navigation JavaScript
