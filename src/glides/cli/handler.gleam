@@ -1,6 +1,9 @@
+import gleam/string
 import glides/cli/exit_status_codes.{type ExitStatusCode, Failure, Success}
 import glides/cli/logger.{type LogLevel, Silent, Verbose}
 import glides/cli/output_helpers
+import glides/parser
+import glides/render
 import simplifile
 
 /// Handle CLI arguments and return appropriate exit status
@@ -57,20 +60,35 @@ fn compile_with_log_level(
   file_path: String,
   log_level: LogLevel,
 ) -> ExitStatusCode {
-  case simplifile.is_file(file_path) {
-    Ok(True) -> {
+  case simplifile.read(file_path) {
+    Ok(content) -> {
       logger.log(log_level, fn() { output_helpers.print_compiling(file_path) })
-      // TODO: Actually compile the file once parser/renderer are implemented
-      logger.log(log_level, fn() {
-        output_helpers.print_success("Compiled successfully!")
-      })
-      Success
-    }
-    Ok(False) -> {
-      logger.log(log_level, fn() {
-        output_helpers.print_error("Not a file: " <> file_path)
-      })
-      Failure
+
+      // Parse and render
+      let presentation = parser.parse(content)
+      let html = render.render_presentation(presentation)
+
+      // Generate output path (.djot -> .html)
+      let output_path = case string.ends_with(file_path, ".djot") {
+        True -> string.drop_end(file_path, 5) <> ".html"
+        False -> file_path <> ".html"
+      }
+
+      // Write output
+      case simplifile.write(output_path, html) {
+        Ok(_) -> {
+          logger.log(log_level, fn() {
+            output_helpers.print_success("Compiled to " <> output_path)
+          })
+          Success
+        }
+        Error(_) -> {
+          logger.log(log_level, fn() {
+            output_helpers.print_error("Failed to write: " <> output_path)
+          })
+          Failure
+        }
+      }
     }
     Error(_) -> {
       logger.log(log_level, fn() {
