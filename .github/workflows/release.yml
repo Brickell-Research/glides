@@ -163,6 +163,7 @@ jobs:
             dist/glides-${{ steps.version.outputs.version }}-checksums.sha256
 
       - name: Update Homebrew formula
+        if: steps.check_release.outputs.exists == 'false'
         env:
           HOMEBREW_TAP_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
